@@ -8,7 +8,7 @@ mdir <- '/Volumes/WDPassport/'
 mdir <- '/home/abby/'
 outdir <- paste0(mdir,'Rock_glacier_research/WUS/Data/Topography/')
 #dem <- raster('/Volumes/WDPassport/DATA/DEM/NED/210m/WUS_NED_210m.tif')
-dem <- raster(paste0(mdir,'DATA/Mapping/WUS_NED_210m.tif')
+dem <- raster(paste0(mdir,'DATA/Mapping/WUS_NED_210m.tif'))
 source(paste0(mdir,'Rock_glacier_research/WUS/Code/calc_headwall.R'))
 
 # create slope raster:
