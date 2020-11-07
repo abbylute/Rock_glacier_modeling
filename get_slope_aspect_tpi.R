@@ -52,7 +52,7 @@ for (ll in 1:nc){
   # running 3million cells takes about 9.7 hours
   cl <- makeCluster(clnum)
   clusterExport(cl, c("calc_headwall","use1","buf","slope","slope_thres","dem"))
-  tic(paste0('calculate headwall metric'))
+  #tic(paste0('calculate headwall metric'))
   headwall_metric <- parApply(cl,use1, 1, function(i) calc_headwall(iter=i,demsmall2=dem,slope=slope,buf=buf,slope_thres=slope_thres))
   
   # add to large output dataframe
@@ -61,7 +61,7 @@ for (ll in 1:nc){
   hwtab <- rbind(hwtab, hnew)
   
   #write.table(headwall_metric,paste0(outdir,'headwall/headwall_metric_group_',ll,'.csv'))
-  toc()
+  #toc()
   stopCluster(cl)
 
 }
