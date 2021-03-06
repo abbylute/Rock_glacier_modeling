@@ -1,6 +1,7 @@
 library(sf)
 library(fasterize)
 library(raster)
+library(R.matlab)
 
 ss <- st_read('/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/geol_poly_albers_anning/geol_poly_albers_anning.shp')
 
@@ -21,4 +22,11 @@ rs <- fasterize(sst, rr, field = "rocktype")
 plot(rs)
 
 writeRaster(rs,'/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/WUS_rocktypes_210m.tif')
+
+# also save as matfile
+xy <- coordinates(rs)
+lith <- values(rs)
+
+writeMat('/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/WUS_rocktypes_210m.mat', xy=xy, lith=lith)
+
 
