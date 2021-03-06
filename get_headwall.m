@@ -23,7 +23,7 @@ figure(1);imagesc(slope);
 % a headwall metric as the percentage of pixels within a given radius 
 % (e.g., 400m) of the target pixel that are above the target pixel and 
 % exceed a slope threshold (e.g., 30°)." 
-buf = 2;
+buf = 1;%2;
 slope_thres = 30;
 hw = ones(size(elev)).*NaN;
 
@@ -44,6 +44,6 @@ for r = 3:(size(elev,1)-buf)
     end % end cols
 end % end rows
 
-save([mdir,'Rock_glacier_research/WUS/Data/Topography/headwall_WUS_210m.mat'],'lat','lon','hw')
+save([mdir,'Rock_glacier_research/WUS/Data/Topography/headwall_WUS_210m_3x3.mat'],'lat','lon','hw')
 
 
