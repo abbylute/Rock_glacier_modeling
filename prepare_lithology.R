@@ -21,11 +21,18 @@ plot(rr)
 rs <- fasterize(sst, rr, field = "rocktype")
 plot(rs)
 
-writeRaster(rs,'/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/WUS_rocktypes_210m.tif')
+
+# Infill nans
+rs2 <- focal(rs, w=matrix(1,nrow=3,ncol=3), fun=mean, na.rm=T, NAonly =T)
+values(rs2) = round(values(rs2))
+
+
+# Save
+writeRaster(rs2,'/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/WUS_rocktypes_210m.tif')
 
 # also save as matfile
-xy <- coordinates(rs)
-lith <- values(rs)
+xy <- coordinates(rs2)
+lith <- values(rs2)
 
 writeMat('/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/WUS_rocktypes_210m.mat', xy=xy, lith=lith)
 
