@@ -134,3 +134,24 @@ xy <- xy[f,]
 xy <- data.frame(xy)
 names(xy) <- c('lon','lat')
 write_csv(xy,'/Volumes/WDPassport/Rock_glacier_research/WUS/Data/Domain/points_to_model.csv')
+
+
+#library(rspatial)
+#library(spData)
+#library(sf)
+library(ggplot2)
+#us <- us_states
+rgdf <- cbind(xy, val[f])
+
+g1 <- ggplot() + 
+  geom_tile(data=rgdf, aes(x=lon,y=lat)) +
+  borders('state') +
+  coord_cartesian(x=c(-125,-103), y = c(31,50)) + 
+  theme_minimal()
+
+jpeg('/Volumes/WDPassport/Rock_glacier_research/WUS/Data/Domain/modeling_domain.jpg',units='in',width=8,height=8,res=300)
+g1 
+dev.off()
+
+
+
