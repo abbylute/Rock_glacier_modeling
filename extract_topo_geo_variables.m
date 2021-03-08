@@ -111,6 +111,8 @@ rgtab.hw5 = rg_hw5;
 rgtab.hw3 = rg_hw3;
 rgtab.lith = rg_lith;
 
+bgtab.Id = (1:size(bg_row,1))';
+bgtab = bgtab(:,{'Id','lon','lat'});
 bgtab.aspect = bg_aspect;
 bgtab.slope = bg_slope;
 bgtab.hw5 = bg_hw5;
