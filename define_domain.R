@@ -41,6 +41,8 @@ plot(mtn)
 # 13- lower alpine
 # 14- upper montane
 # 15- lower montane
+# 16- remaining mtn areas with frost
+# 17- remaining mtn areas without frost
 
 
 ##### Crop temperature to WUS #####
@@ -106,13 +108,13 @@ sum(is.na(mtn_locs))
 hist(mtn_locs)
 max(mtn_locs)
 
-tavg7 <- tavg
-tavg7[tavg7>7] <- NA
-plot(tavg7)
+tavg8 <- tavg
+tavg8[tavg8>8] <- NA
+plot(tavg8)
 
 
 ##### Combine temperature and mtn layers #####
-rgdomain <- mask(mtn_fine15,tavg7)
+rgdomain <- mask(mtn_fine15,tavg8)
 plot(rgdomain)
 
 # double check that all rock glaciers fall within this temperature/mtn domain:
@@ -121,6 +123,23 @@ sum(is.na(mtn_locs))
 n210 <- sum(!is.na(values(rgdomain)))
 # including temperature<8 hardly reduces the domain at all compared to mtn mask
 # including temperature<7 reduces the number of pixels (relative to mtn mask) by ~23%
+
+
+##### See if domain covers Millar's Sierra Nevada RGs #####
+mi <- read_csv('/Users/abbylute/Documents/IGERT/RockGlacierModeling/Data/Glacier/Millar_SierraNevada_RIF_Inventory/RIFDatabase_NSIDC.csv',
+               skip =3)
+mi <- mi %>% filter(Activity == 'M') # only modern features, not relict
+mi_locs <- raster::extract(rgdomain, mi[,c(4,3)])
+sum(is.na(mi_locs))
+plot(rgdomain)
+points(mi[,c(4,3)])
+
+##### See if domain covers Kinworthy's New Mexico RGs #####
+# their rg classification looks for features with vegetation and with thaw features, suggesting that many of 
+# these are relicts. the warmest one has preindustrial MAT of 12.7C! probably not worth including these.
+#nm <- read_csv('/Volumes/WDPassport/Data/Rock_glaciers/Kinworthy_NM_inventory/Kinworthy_NM_inventory.csv')
+#nm_locs <- raster::extract(rgdomain, nm[,c(3,2)])
+#sum(is.na(nm_locs))
 
 
 ##### Save the domain mask #####
@@ -134,24 +153,3 @@ xy <- xy[f,]
 xy <- data.frame(xy)
 names(xy) <- c('lon','lat')
 write_csv(xy,'/Volumes/WDPassport/Rock_glacier_research/WUS/Data/Domain/points_to_model.csv')
-
-
-#library(rspatial)
-#library(spData)
-#library(sf)
-library(ggplot2)
-#us <- us_states
-rgdf <- cbind(xy, val[f])
-
-g1 <- ggplot() + 
-  geom_tile(data=rgdf, aes(x=lon,y=lat)) +
-  borders('state') +
-  coord_cartesian(x=c(-125,-103), y = c(31,50)) + 
-  theme_minimal()
-
-jpeg('/Volumes/WDPassport/Rock_glacier_research/WUS/Data/Domain/modeling_domain.jpg',units='in',width=8,height=8,res=300)
-g1 
-dev.off()
-
-
-
