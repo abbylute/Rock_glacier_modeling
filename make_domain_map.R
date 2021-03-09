@@ -27,8 +27,8 @@ rm(dem,elev,xy,rgd);gc();
 
 
 g1 <- ggplot() + 
-  geom_tile(data=elevdf, aes(x=x,y=y,color=elev)) +
   borders('state', fill='grey95') +
+  geom_tile(data=elevdf, aes(x=x,y=y,color=elev)) +
   #borders('world') +
   geom_point(data=rgs, aes(x=lon,y=lat), size=.6) +
   #geom_point(data=mi, aes(x=Longitude,y=Latitude),size=.5,color='red') +
