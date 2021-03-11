@@ -22,4 +22,10 @@ snow = readtable([indir,'bg_snow.txt']);
 
 % compile and save bg data
 bgtab = [topogeo, clim, snow];
-writetable(bgtab, [outdir,'sample.txt']);
+writetable(bgtab, [outdir,'background.txt']);
+
+% randomly sample some background pixels to use in maxent
+ns = 10000; % number of samples
+y = datasample(1:size(bgtab,1), ns, 'Replace', false);
+bgtab1 = bgtab(y,:);
+writetable(bgtab1, [outdir,'background_',num2str(ns),'.txt']);
