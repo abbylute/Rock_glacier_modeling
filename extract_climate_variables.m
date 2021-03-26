@@ -1,9 +1,10 @@
 % Extract climate variables for bg and rg locations
 
 era = 'PRE';
-cdir = ['/home/abby/DATA/WRF/downscaled/WUS/',era,'/summaries/'];
+cdir = ['/home/abby/DATA/WRF/downscaled/WUS/',era,'/summaries/climate/WUS/'];
 rdir = '/home/abby/Rock_glacier_research/WUS/Data/';
 outdir = [rdir,'Maxent_tables/'];
+outmatdir = [rdir,'Climate/'];
 
 % load points
 rg = matfile([rdir,'Rock_glaciers/index_rg_points_in_grid.mat']);
@@ -47,6 +48,10 @@ for ii = 1:size(rg_col,1)
     rg_tmean(ii) = tmean(rg_row(ii),rg_col(ii));
 end
 
+
+save([outmatdir,'tmin.mat'],'tmin');
+save([outmatdir,'tmax.mat'],'tmax');
+save([outmatdir,'tmean.mat'],'tmean');
 clear tmin tmax tmean
 
 
@@ -64,6 +69,7 @@ for ii = 1:size(rg_col,1)
     rg_tschange(ii) = tt(rg_row(ii),rg_col(ii));
 end
 
+save([outmatdir,'tschange.mat'],'tt');
 clear tt
 
 
@@ -81,6 +87,7 @@ for ii = 1:size(rg_col,1)
     rg_ppt(ii) = ppt(rg_row(ii),rg_col(ii));
 end
 
+save([outmatdir,'ppt.mat'],'ppt');
 clear ppt
 
 
@@ -98,6 +105,7 @@ for ii = 1:size(rg_col,1)
     rg_sw(ii) = sw(rg_row(ii),rg_col(ii));
 end
 
+save([outmatdir,'swdown.mat'],'sw');
 clear sw
 
 
