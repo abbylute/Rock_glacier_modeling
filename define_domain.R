@@ -23,7 +23,7 @@ tavg <- ll; rm(ll); gc();
 
 
 ##### Import States #####
-states <- st_read('Documents/IGERT/RockGlacierModeling/Data/Terrain/states_21basic/states.shp')
+states <- st_read('/Users/abbylute/Documents/IGERT/RockGlacierModeling/Data/Terrain/states_21basic/states.shp')
 states <- st_transform(states, crs(mtn))
 
 
@@ -63,9 +63,9 @@ mtn <- projectRaster(mtn,tavg)
 rg <- read_delim('/Volumes/WDPassport/Rock_glacier_research/Old/Data/Rock_glaciers/RG_Inventory_v2/RG.FOI_Inventory.txt',' ')
 rg %>% filter(type=='rockglacier') %>% group_by(activity) %>% count()
 # only use RGs of class 1 (active)
-rg <- rg %>% filter(type=='rockglacier',activity==1) %>% select(lon,lat)
+rg <- rg %>% filter(type=='rockglacier',activity==1) %>% dplyr::select(lon,lat)
 # save a table of active rock glacies
-rg1 <- rg %>% mutate('species' = 'rockglacier') %>% select(species,lon,lat)
+rg1 <- rg %>% mutate('species' = 'rockglacier') %>% dplyr::select(species,lon,lat)
 write_csv(rg1, '/Volumes/WDPassport/Rock_glacier_research/WUS/Data/Rock_glaciers/active_rgs.csv')
 
 plot(mtn)
