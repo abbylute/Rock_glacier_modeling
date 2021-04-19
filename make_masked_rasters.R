@@ -21,6 +21,13 @@ dem <- raster('/Volumes/WDPassport/DATA/DEM/NED/new/WUS_NED_210m.tif')
 #rm(icol, irow); gc();
 
 
+# lithology
+lith <- raster('/Volumes/WDPassport/DATA/Geology/Lithology/Generalizedlith/WUS_rocktypes_210m.tif')
+lith <- crop(lith, domain)
+lith <- mask(lith, domain)
+writeRaster(lith, paste0(outdir,'lithology.tif'))
+rm(lith);gc();
+
 # aspect
 asp <- raster(paste0(dir,'Topography/aspect_210m_WUS.tif'))
 asp <- crop(asp, domain)
@@ -156,23 +163,35 @@ rm(tt, tt1);gc();
 
 mrdir <- paste0(dir,'Masked_rasters/')
 
-#rr <- stack(raster(paste0(mrdir,'aspect.tif')))
-#rr[[2]] <- raster(paste0(mrdir,'slope.tif'))
-#rr[[3]] <- raster(paste0(mrdir,'headwall5.tif'))
-#rr[[4]] <- raster(paste0(mrdir,'headwall3.tif'))
-#rr[[5]] <- raster(paste0(mrdir,'tmin.tif'))
-#rr[[6]] <- raster(paste0(mrdir,'tmax.tif'))
-#rr[[7]] <- raster(paste0(mrdir,'tmean.tif'))
-#rr[[8]] <- raster(paste0(mrdir,'tschange.tif'))
-#rr[[9]] <- raster(paste0(mrdir,'ppt.tif'))
-#rr[[10]] <- raster(paste0(mrdir,'swdown.tif'))
-#rr[[11]] <- raster(paste0(mrdir,'sfe.tif'))
-#rr[[12]] <- raster(paste0(mrdir,'maxswe.tif'))
-#rr[[13]] <- raster(paste0(mrdir,'duration.tif'))
-#rr[[14]] <- raster(paste0(mrdir,'nosnowdays.tif'))
+rr <- stack(raster(paste0(mrdir,'aspect.tif')))
+rr[[2]] <- raster(paste0(mrdir,'slope.tif'))
+rr[[3]] <- raster(paste0(mrdir,'headwall5.tif'))
+rr[[4]] <- raster(paste0(mrdir,'headwall3.tif'))
+rr[[5]] <- raster(paste0(mrdir,'tmin.tif'))
+rr[[6]] <- raster(paste0(mrdir,'tmax.tif'))
+rr[[7]] <- raster(paste0(mrdir,'tmean.tif'))
+rr[[8]] <- raster(paste0(mrdir,'tschange.tif'))
+rr[[9]] <- raster(paste0(mrdir,'ppt.tif'))
+rr[[10]] <- raster(paste0(mrdir,'swdown.tif'))
+rr[[11]] <- raster(paste0(mrdir,'sfe.tif'))
+rr[[12]] <- raster(paste0(mrdir,'maxswe.tif'))
+rr[[13]] <- raster(paste0(mrdir,'duration.tif'))
+rr[[14]] <- raster(paste0(mrdir,'nosnowdays.tif'))
+rr[[15]] <- raster(paste0(mrdir,'lithology.tif'))
+
+# save longlat version
+writeRaster(rr, paste0(mrdir,'maxent_variable_stack_longlat.tif'))
 
 # project to UTM
-#rr <- projectRaster(rr, crs = "+proj=utm +zone=11 +ellps=GRS80 +units=m +no_defs ")
+rr <- projectRaster(rr, crs = "+proj=utm +zone=11 +ellps=GRS80 +units=m +no_defs ")
 
-#writeRaster(rr, paste0(mrdir,'maxent_variable_stack.tif'))
+# save utm version
+writeRaster(rr, paste0(mrdir,'maxent_variable_stack_utm.tif'))
+
+# DELETE:
+#rr <- stack(paste0(mrdir,'maxent_variable_stack.tif'))
+#lith <- raster(paste0(mrdir,'lithology.tif'))
+#lith <- projectRaster(lith, crs = "+proj=utm +zone=11 +ellps=GRS80 +units=m +no_defs ")
+#rr[[15]] <- lith
+#writeRaster(rr, paste0(mrdir,'maxent_variable_stack_utm.tif'))
 
