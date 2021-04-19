@@ -35,9 +35,12 @@ rm(domain);gc();
  
 # Load raster stack
 #-----------------------------------------------------------------------
-rr <- stack(paste0(mrdir,'maxent_variable_stack.tif'))
+rr <- stack(paste0(dir,'Masked_rasters/maxent_variable_stack_utm.tif'))
 names(rr) <- c('aspect','slope','hw5','hw3','tmin','tmax','tmean','tschange','ppt',
-               'swdown','sfe','maxswe','duration','nosnowdays')
+               'swdown','sfe','maxswe','duration','nosnowdays','lith')
+
+# remove lithology layer since categoricals are not allowed in SAC calculations
+rr <- rr[,,1:14]
 
 
 # Assess spatial autocorrelation
@@ -83,13 +86,16 @@ rangeExplorer(rasterLayer = rr)
 blocksz = 400000
 
 
-# Create blocks
+# Create spatial blocks
 #------------------------------------------------------------
 # NOTE: if I use rgsf for 'speciesData', the blocks don't cover the full domain.
 # using the entirety of bgsf takes over an hour to run. But sampling from bgsf
 # seems to work well.
 # k = 5 means training on ~80% of the data and testing on ~20% of the data
-sb <- spatialBlock(speciesData = bgsf[seq(1,12721312,101),],
+set.seed(17)
+xx <- sample(1:dim(bgsf)[1], 10000, replace = F)
+
+sb <- spatialBlock(speciesData = bgsf[xx,],
                    #species = "species",
                    rasterLayer = rr,
                    theRange = blocksz, # size of the blocks
@@ -105,3 +111,39 @@ saveRDS(sb, file = paste0(dir,'CV/spatial_blocks_bs',format(blocksz, scientific=
 
 
 foldExplorer(blocks = sb, rasterLayer = rr, speciesData = rgsf)
+
+
+# Create environmental blocks based on MAT
+#------------------------------------------------------------
+rg <- read_csv(paste0(dir,'Maxent_tables/sample.txt'))
+rg <- rg %>% dplyr::select(-c('hw3','tmin','tmax','ppt','maxswe'))
+domain <- raster(paste0(dir,'Domain/rg_domain.tif'))
+
+rgsf <- st_as_sf(rg, coords = c('lon','lat'), crs = crs(domain))
+rgsf <- st_transform(rgsf, crs = "+proj=utm +zone=11 +ellps=GRS80 +units=m +no_defs ")
+rm(domain);gc();
+
+rr <- subset(rr, c(1:3,7:8,10:11,13:15))
+
+eb <- envBlock(rasterLayer = rr$tmean,
+               speciesData = rgsf[,c(1:6)], #bgsf[seq(1,12721312,101),],
+               k = 2,
+               standardization = 'normal',
+               rasterBlock = F)
+saveRDS(eb, file = paste0(dir,'CV/MAT_blocks.RData'))
+
+fid <- as.character(eb$foldID)
+
+rg2 <- cbind(rg, fid)
+
+ggplot(rg2) +
+  geom_point(aes(x=lon,y=lat,color=fid))
+
+rglong <- rg2 %>% pivot_longer(cols=lon:nosnowdays, names_to='covar', values_to='value')
+
+ggplot(rglong) +
+  geom_density(aes(x=value,group=fid, color=fid)) +
+  facet_wrap(~covar, scales='free')
+
+
+               
