@@ -1,11 +1,15 @@
 
 # assess autocorrelation and design cross validation
 
+# NOTE: this used to run on my laptop, then I updated some packages and now I can't get the 
+# spatialAutoRange function to run. I had to run it on tesla instead.
+
 library(blockCV)
 library(tidyverse)
 library(sf)
 library(raster)
- 
+library(tictoc)
+
 dir <- '/Volumes/WDPassport/Rock_glacier_research/WUS/Data/'
 
 
@@ -21,38 +25,33 @@ rgsf <- st_transform(rgsf, crs = "+proj=utm +zone=11 +ellps=GRS80 +units=m +no_d
 bgsf <- st_as_sf(bg, coords = c('lon','lat'), crs = crs(domain))
 bgsf <- st_transform(bgsf, crs = "+proj=utm +zone=11 +ellps=GRS80 +units=m +no_defs ")
 
- 
-
-# Create presence-background SpatialPointsDataFrame
-#-----------------------------------------------------------------------
-#PB <- data.frame(cbind('Species' = 1, rg[,2:3]))
-#PB <- rbind(PB, data.frame(cbind('Species' = 0, bg[,2:3])))
- 
-#pb_data <- st_as_sf(PB, coords = c('lon','lat'), crs = crs(domain)) 
 rm(domain);gc();
  
 
  
 # Load raster stack
 #-----------------------------------------------------------------------
-rr <- stack(paste0(dir,'Masked_rasters/maxent_variable_stack_utm.tif'))
+rr <- stack(paste0(dir,'Masked_rasters/PRE/maxent_variable_stack_utm.tif'))
 names(rr) <- c('aspect','slope','hw5','hw3','tmin','tmax','tmean','tschange','ppt',
                'swdown','sfe','maxswe','duration','nosnowdays','lith')
 
 # remove lithology layer since categoricals are not allowed in SAC calculations
-rr <- rr[,,1:14]
+#rr <- rr[,,1:14]
+# remove variables deemed too collinear
+rr <- subset(rr, c(1:3,7:8,10:11,13:14))
 
+#r1 <- crop(rr, extent(rr,2000,3050,2000,3050))
 
 # Assess spatial autocorrelation
 #-----------------------------------------------------------------------
-sampnum = 50000;
-dev.off();gc()
+sampnum = 10000;
+#dev.off();gc()
 quartz()
 tic()
 sac <- spatialAutoRange(rasterLayer = rr,
                         sampleNumber = sampnum,
-                        doParallel = TRUE,
-                        showPlots = TRUE)#,
+                        doParallel = T,
+                        showPlots = T)#,
 toc()
 saveRDS(sac, file = paste0(dir,'SAC/SAC_',sampnum,'.RData'))
 
