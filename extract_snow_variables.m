@@ -1,10 +1,10 @@
 % Extract snow variables for bg and rg locations
 
-era = 'PRE';
+era = 'PGW';
 cdir = ['/home/abby/DATA/WRF/downscaled/WUS/',era,'/summaries/snow/WUS/'];
 rdir = '/home/abby/Rock_glacier_research/WUS/Data/';
-outdir = [rdir,'Maxent_tables/'];
-outmatdir = [rdir,'Snow/'];
+outdir = [rdir,'Maxent_tables/',era,'/'];
+outmatdir = [rdir,'Snow/',era,'/'];
 
 % load points
 rg = matfile([rdir,'Rock_glaciers/index_rg_points_in_grid.mat']);
