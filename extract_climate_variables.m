@@ -1,10 +1,10 @@
 % Extract climate variables for bg and rg locations
 
-era = 'PRE';
+era = 'PGW';
 cdir = ['/home/abby/DATA/WRF/downscaled/WUS/',era,'/summaries/climate/WUS/'];
 rdir = '/home/abby/Rock_glacier_research/WUS/Data/';
-outdir = [rdir,'Maxent_tables/'];
-outmatdir = [rdir,'Climate/'];
+outdir = [rdir,'Maxent_tables/',era,'/'];
+outmatdir = [rdir,'Climate/',era,'/'];
 
 % load points
 rg = matfile([rdir,'Rock_glaciers/index_rg_points_in_grid.mat']);
