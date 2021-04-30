@@ -6,6 +6,7 @@ library(raster)
 library(tidyverse)
 library(RColorBrewer)
 library(grid) # gpar
+library(pals)
 
 outdir <- 'WUS/Figures/'
 
@@ -40,13 +41,21 @@ for (ll in seq_along(varmod)){
   names(df1) <- c('x','y','val')
   df1 <- df1 %>% filter(!is.na(val))
   
+  if (ll==1){
+    colo <- kovesi.cyclic_mygbm_30_95_c78_s25(100)
+      #kovesi.cyclic_mygbm_30_95_c78
+    #kovesi.cyclic_mygbm_30_95_c78_s25
+  }else{
+    colo <- rev(brewer.pal(11,cbs[ll]))
+  }
+  
   g1 <- ggplot() + 
     borders('state', fill='grey95') +
     geom_tile(data=df1, aes(x=x,y=y,color=val)) +
     #borders('world') +
     #geom_point(data=rgs, aes(x=lon,y=lat), size=.6) +
     coord_cartesian(x=c(-124.5,-104.5), y = c(31.5,49)) + 
-    scale_color_gradientn(colors=rev(brewer.pal(11,cbs[ll])), name = nms[ll]) + # trans='log'
+    scale_color_gradientn(colors=colo, name = nms[ll]) + # trans='log'
     theme_bw() +
     theme(panel.grid = element_blank(),
           legend.position = c(0.1, 0.14),
@@ -130,16 +139,42 @@ df1 <- df1 %>% filter(!is.na(val))
 g1 <- ggplot() + 
   borders('state', fill='grey95') +
   geom_tile(data=df1, aes(x=x,y=y,color=val)) +
-  #borders('world') +
-  #geom_point(data=rgs, aes(x=lon,y=lat), size=.6) +
   coord_cartesian(x=c(-124.5,-104.5), y = c(31.5,49)) + 
-  scale_color_gradientn(colors=rev(brewer.pal(11,cbs[ll])), name = nms[ll]) + # trans='log'
+  scale_color_gradientn(colors=rev(brewer.pal(11,cbs[ll])), name = nms[ll], trans='log',
+                        breaks = c(0,10,30,60,120)) +
   theme_bw() +
   theme(panel.grid = element_blank(),
         legend.position = c(0.1, 0.14),
         legend.title = element_text(size = 8)) +
   labs(x=NULL,y=NULL) 
 jpeg(paste0(outdir,outnm,'_map.jpeg'), units = 'in', width = 6, height = 6, res = 500)
+g1
+dev.off()
+
+
+# Lithology (separately because categorical)
+#----------------------------------------------
+ll <- 10
+outnm <- names(rr)[ll]
+licb <- 'Paired'
+
+df1 <- as.data.frame(cbind(xy,values(rr[[ll]])))
+names(df1) <- c('x','y','val')
+df1 <- df1 %>% filter(!is.na(val))
+df1$val <- as.character(df1$val)
+
+g1 <- 
+  ggplot() + 
+  borders('state', fill='grey95') +
+  geom_tile(data=df1, aes(x=x,y=y,fill=val)) +
+  coord_cartesian(x=c(-124.5,-104.5), y = c(31.5,49)) + 
+  scale_fill_manual(values=rev(brewer.pal(11,licb)), name = 'Lithology\nClass',
+                    breaks = c("1","2","3","4","5","6","7","8","9","10","11")) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        legend.title = element_text(size = 8)) +
+  labs(x=NULL,y=NULL) 
+jpeg(paste0(outdir,outnm,'_map.jpeg'), units = 'in', width = 6.7, height = 6, res = 500)
 g1
 dev.off()
 
