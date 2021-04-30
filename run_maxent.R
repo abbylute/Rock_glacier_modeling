@@ -100,8 +100,8 @@ occ <- as.data.frame(samp[,2:dim(samp)[2]])
 names(occ)[1:2] <- c("LON","LAT")
 bg.coords = as.data.frame(bgr[,2:dim(bgr)[2]])
 names(bg.coords)[1:2] <- c("LON","LAT")
-betas <- seq(1,101,10)#c(1,2,4,6,8,10)
-feats <- c('L','LQ','LQP','LQPH','LQPHT')
+betas <- 6; #seq(1,101,10)#c(1,2,4,6,8,10)
+feats <- 'LQH' #c('L','LQ','LQP','LQPH','LQPHT')
 tic('running maxent took ')
 eval1 <- ENMevaluate_al(occ=occ, 
                         env=NULL, 
@@ -159,7 +159,7 @@ dismo::ssb() # assesses spatial sorting bias as discussed in Hijmans, 2012
 #rm(dir,domain);gc();
 
 # prepare raster:
-dir <- 'WUS/Data/Masked_rasters/'
+dir <- 'WUS/Data/Masked_rasters/PRE/'
 rr <- stack(paste0(dir,'maxent_variable_stack_longlat.tif'));
 names(rr) <- c('aspect','slope','hw5','hw3','tmin','tmax','tmean','tschange','ppt',
                'swdown','sfe','maxswe','duration','nosnowdays','lith')
@@ -170,7 +170,8 @@ rr <- subset(rr, c(1:3,7:8,10:11,13:15))
 #bg.coords <- bg.coords[,1:7]
 betas <- c(1,1.5,2,3,4,6,8,10)#c(1,2,4,6,8,10)
 feats <- c('L','LQ','LQP','LQPH','LQPHT')
-
+feats <- c('LP','LT','LH','LQH','LQT','LQTH','LQPT')
+feats <- c('LQT','LQTH','LQPT')
 
 eval1 <- ENMevaluate(occ=occ[,1:2], 
                         env=rr, 
