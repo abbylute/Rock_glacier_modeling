@@ -3,7 +3,7 @@
 library(raster)
 library(R.matlab)
 
-era <- 'PGW'
+era <- 'CTRL'
 dir <- '/Volumes/WDPassport/Rock_glacier_research/WUS/Data/'
 outdir <- paste0(dir,'Masked_rasters/',era,'/')
 
