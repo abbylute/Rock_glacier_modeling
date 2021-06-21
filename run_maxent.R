@@ -81,14 +81,19 @@ ggplot(s2)+
 geom_point(data=s2,aes(x=lon,y=lat,color=fold)) 
 
 
+# add rain variable
+#--------------------------------------------
+samp$rain <- samp$ppt - samp$sfe
+bgr$rain <- bgr$ppt - bgr$sfe
+
+
 # remove collinear variables
 #--------------------------------------------
 # variables to remove:
-# 3x3 window headwall metric, tmin, tmax, maximum SWE, and precipitation
-not_use <- c('hw3','tmin','tmax','maxswe','ppt')
-#not_use <- c('hw3','tmin','tmax','maxswe','ppt','sfe','duration','maxswe','nosnowdays')
-samp <- samp %>% dplyr::select(-not_use)
-bgr <- bgr %>% dplyr::select(-not_use)
+# 3x3 window headwall metric, tmin, tmax, maximum SWE, precipitation, tschange
+not_use <- c('hw3','tmin','tmax','maxswe','ppt','tschange','duration')
+samp <- samp %>% dplyr::select(-all_of(not_use))
+bgr <- bgr %>% dplyr::select(-all_of(not_use))
 
 
 
@@ -100,8 +105,8 @@ occ <- as.data.frame(samp[,2:dim(samp)[2]])
 names(occ)[1:2] <- c("LON","LAT")
 bg.coords = as.data.frame(bgr[,2:dim(bgr)[2]])
 names(bg.coords)[1:2] <- c("LON","LAT")
-betas <- 6; #seq(1,101,10)#c(1,2,4,6,8,10)
-feats <- 'LQH' #c('L','LQ','LQP','LQPH','LQPHT')
+betas <- 7; #seq(1,101,10)#c(1,2,4,6,8,10)
+feats <- 'LQTH' #c('L','LQ','LQP','LQPH','LQPHT')
 tic('running maxent took ')
 eval1 <- ENMevaluate_al(occ=occ, 
                         env=NULL, 
@@ -127,13 +132,26 @@ saveRDS(eval1, file=paste0(outdir,'ENMeval_object.RData'))
 
 
 
-
+# read in RData files using readRDS
 # can read in .dat files using read_csv
 
 # currently cannot calculate niche overlap because predictions are not raster, may be possible to modify the fucntion to do this though
 eval1@models # html
 eval1@results # training and test AUCs, AICs
+# AUC_bin.1 is the test AUC for a model built on folds excluding 1 (e.g. built on fold 2 in the case of 2 folds),
+# and tested on fold 1
+# diff_AUC_bin.1 is the training AUC (built on fold 1) minus the test AUC (fold 2)
+# avg.test.AUC is the average of AUC_bin.1 and AUC_bin.2
+# train.AUC is different than avg.test.AUC since it is calculated from the full model
+# in coldwarm split, fold 2 is the cold one
 
+train_auc_fold1 = eval1@results$AUC_bin.2+eval1@results$diff.AUC_bin.2 # training auc for model calibrated on fold1
+train_auc_fold2 = eval1@results$AUC_bin.1+eval1@results$diff.AUC_bin.1
+test_auc_fold1 = eval1@results$AUC_bin.2 # test auc for model calibrated on fold1, tested on fold2
+test_auc_fold2 = eval1@results$AUC_bin.1
+
+# NOTE: these response curves are not the same as either of the response curve sets
+# that are included in the maxent.html file
 response(eval1@models[[2]]) # response curves (number is the betas/feats combo numbere)
 
 dismo::pwdSample() # does pair-wise distance sampling as described in Hijmans, 2012
@@ -148,7 +166,7 @@ dismo::ssb() # assesses spatial sorting bias as discussed in Hijmans, 2012
 # alternate approach using raster and ENMeval original code:
 #rr <- stack('WUS/Data/Masked_rasters/maxent_variable_stack.tif')
 #names(rr) <- c('aspect','slope','hw5','hw3','tmin','tmax','tmean','tschange','ppt',
-               'swdown','sfe','maxswe','duration','nosnowdays')
+#               'swdown','sfe','maxswe','duration','nosnowdays')
 
 #dir <- '/Volumes/WDPassport/Rock_glacier_research/WUS/Data/'
 #domain <- raster(paste0(dir,'Domain/rg_domain.tif'))
@@ -174,26 +192,17 @@ feats <- c('LP','LT','LH','LQH','LQT','LQTH','LQPT')
 feats <- c('LQT','LQTH','LQPT')
 
 eval1 <- ENMevaluate(occ=occ[,1:2], 
-                        env=rr, 
-                        bg.coords=bg.coords[,1:2],
-                        occ.grp = s2$fold,
-                        bg.grp = bgfold,
-                        rasterPreds=TRUE, 
-                        method='user', #method='block', 
-                        RMvalues=betas, 
-                        fc=feats, 
-                        clamp=TRUE,
-                        categoricals='lith', 
-                        algorithm='maxent.jar')#, 
-                        #jackknife=TRUE, 
-                        #outdir=outdir) 
+                     env=rr, 
+                     bg.coords=bg.coords[,1:2],
+                     occ.grp = s2$fold,
+                     bg.grp = bgfold,
+                     rasterPreds=TRUE, 
+                     method='user', #method='block', 
+                     RMvalues=betas, 
+                     fc=feats, 
+                     clamp=TRUE,
+                     categoricals='lith', 
+                     algorithm='maxent.jar')
+
 saveRDS(eval1, file=paste0(outdir,'ENMeval_object.RData'))
-
-# make predictions across preindustrial domain:
-predfn <- paste0(outdir,'preindustrial_predictions.tif')
-
-mx = eval1@models[[1]]
-pp <- predict(mx, rr, ext=NULL, filename=outfn, progress='text')#, args="outputformat=cloglog")
-# the default outputformat from the predict function is cloglog, which is the easiest 
-# to conceptualize: it gives an estimate between 0 and 1 of probability of presence. 
 
