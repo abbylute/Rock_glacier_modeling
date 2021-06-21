@@ -1,6 +1,6 @@
 % Extract snow variables for bg and rg locations
 
-era = 'PGW';
+era = 'CTRL';
 cdir = ['/home/abby/DATA/WRF/downscaled/WUS/',era,'/summaries/snow/WUS/'];
 rdir = '/home/abby/Rock_glacier_research/WUS/Data/';
 outdir = [rdir,'Maxent_tables/',era,'/'];
@@ -92,6 +92,9 @@ rg_nosnowdays = nan(size(rg_col,1),1);
 for ii = 1:size(rg_col,1)
     rg_nosnowdays(ii) = tt(rg_row(ii),rg_col(ii));
 end
+
+bg_nosnowdays(isnan(bg_nosnowdays))=0;
+rg_nosnowdays(isnan(rg_nosnowdays))=0;
 
 save([outmatdir,'nosnowdays.mat'],'tt');
 clear tt

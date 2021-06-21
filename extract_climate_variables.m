@@ -1,6 +1,6 @@
 % Extract climate variables for bg and rg locations
 
-era = 'PGW';
+era = 'CTRL'; %'PRE','PGW'
 cdir = ['/home/abby/DATA/WRF/downscaled/WUS/',era,'/summaries/climate/WUS/'];
 rdir = '/home/abby/Rock_glacier_research/WUS/Data/';
 outdir = [rdir,'Maxent_tables/',era,'/'];
