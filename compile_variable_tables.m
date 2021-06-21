@@ -1,7 +1,7 @@
 % Compile topo, geo, climate, and snow variables into tables to input to
 % Maxent
 
-era = 'PGW';
+era = 'CTRL';
 indir = '/home/abby/Rock_glacier_research/WUS/Data/Maxent_tables/';
 outdir = indir;
 
