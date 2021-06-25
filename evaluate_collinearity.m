@@ -2,6 +2,7 @@
 
 indir = '/home/abby/Rock_glacier_research/WUS/Data/Maxent_tables/';
 
+
 %% load preindustrial data
 bg_pre = readtable([indir,'PRE/background.txt']);
 bg_pre.rain = bg_pre.ppt - bg_pre.sfe;
