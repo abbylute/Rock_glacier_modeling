@@ -1,6 +1,6 @@
 % Evaluate collinearity of variables to input to Maxent
 
-indir = ['/home/abby/Rock_glacier_research/WUS/Data/Maxent_tables/'];
+indir = '/home/abby/Rock_glacier_research/WUS/Data/Maxent_tables/';
 
 %% load preindustrial data
 bg_pre = readtable([indir,'PRE/background.txt']);
